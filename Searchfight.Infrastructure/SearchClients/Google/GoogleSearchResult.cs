@@ -1,4 +1,4 @@
-﻿namespace Searchfight.Infrastructure
+﻿namespace Searchfight.Infrastructure.SearchClients.Google
 {
     internal class GoogleSearchResult
     {

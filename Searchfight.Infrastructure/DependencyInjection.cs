@@ -1,6 +1,8 @@
 ﻿using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Searchfight.Infrastructure.Configuration;
+using Searchfight.Infrastructure.SearchClients.Bing;
+using Searchfight.Infrastructure.SearchClients.Google;
 
 namespace Searchfight.Infrastructure
 {

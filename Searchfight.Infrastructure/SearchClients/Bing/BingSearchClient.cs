@@ -3,11 +3,10 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Searchfight.Infrastructure.Configuration;
 
-namespace Searchfight.Infrastructure
+namespace Searchfight.Infrastructure.SearchClients.Bing
 {
     class BingSearchClient : IBingSearchClient
     {

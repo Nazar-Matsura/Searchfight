@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Searchfight.Infrastructure.Configuration;
 
-namespace Searchfight.Infrastructure
+namespace Searchfight.Infrastructure.SearchClients.Google
 {
     internal class GoogleSearchClient : IGoogleSearchClient
     {
