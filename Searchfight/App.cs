@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Searchfight.Application;
-using Searchfight.Core.Domain;
+using Searchfight.Core.ViewModels;
 
 namespace Searchfight.Terminal
 {
     public class App
     {
+        private readonly ISearchfightService _searchfightService;
         private readonly ISearchDataProvider _searchDataProvider;
         private readonly IMergeQuotedService _mergeQuotedService;
         private const string Quote = "\"";
 
         public App(ISearchDataProvider searchDataProvider, 
-            IMergeQuotedService mergeQuotedService)
+            IMergeQuotedService mergeQuotedService,
+            ISearchfightService searchfightService)
         {
             _searchDataProvider = searchDataProvider;
             _mergeQuotedService = mergeQuotedService;
+            _searchfightService = searchfightService;
         }
 
         public async Task Run(string[] args)
@@ -46,30 +49,25 @@ namespace Searchfight.Terminal
 
         private async Task SearchAndPrintFor(string[] args)
         {
-            var results = await _searchDataProvider.CountSearchTermsResults(args.ToList());
-            PrintResults(results);
+            var data = await _searchDataProvider.CountSearchTermsResults(args.ToList());
+            var report = _searchfightService.GenerateReport(data);
+            PrintResults(report);
         }
 
-        private void PrintResults(List<SearchResults> results)
+        private void PrintResults(GeneralSearchfightViewModel results)
         {
-            var groupedBySearchTerm = results
-                .GroupBy(r => r.SearchTerm);
-            foreach (var group in groupedBySearchTerm)
+            foreach (var searchTermResults in results.ResultsBySearchTerm)
             {
-                var str = group.OrderBy(r => r.SearchEngine).Select(r => $"{r.SearchEngine}: {r.ResultsCount}");
-                Console.WriteLine($"{group.Key}: {string.Join(' ', str)}");
+                var str = searchTermResults.SearchEngineResults.Select(r => $"{r.SearchEngine}: {r.ResultsCount}");
+                Console.WriteLine($"{searchTermResults.SearchTerm}: {string.Join(' ', str)}");
             }
 
-            var groupedByEngine = results
-                .GroupBy(r => r.SearchEngine)
-                .Select(g => new {Engine = g.Key, TopResult = g.OrderByDescending(r => r.ResultsCount).First().SearchTerm});
-            foreach (var engineResult in groupedByEngine)
+            foreach (var engineResult in results.SearchEngineWinners)
             {
-                Console.WriteLine($"{engineResult.Engine} winner: {engineResult.TopResult}");
+                Console.WriteLine($"{engineResult.SearchEngine} winner: {engineResult.SearchTerm}");
             }
 
-            var topResult = results.OrderByDescending(r => r.ResultsCount).First().SearchTerm;
-            Console.WriteLine($"Total winner: {topResult}");
+            Console.WriteLine($"Total winner: {results.TotalWinner}");
         }
 
         private bool ShouldRepeat()
