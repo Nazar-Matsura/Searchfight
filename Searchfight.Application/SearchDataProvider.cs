@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Searchfight.Core.Domain;
 using Searchfight.Infrastructure;
+using Searchfight.Infrastructure.SearchClients;
+using Searchfight.Infrastructure.SearchClients.Google;
 
 namespace Searchfight.Application
 {
