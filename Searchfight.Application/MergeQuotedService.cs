@@ -11,24 +11,37 @@ namespace Searchfight.Application
             var quotedString = new StringBuilder();
             foreach (var value in arguments)
             {
-                var valueBetweenQuotes = new StringBuilder(value);
+                StringBuilder valueBetweenQuotes = null;
                 if (value.StartsWith(quote))
                 {
-                    valueBetweenQuotes.Remove(valueBetweenQuotes.Length-1, 1);
+                    valueBetweenQuotes = new StringBuilder(value).Remove(0, 1);
                     quotedString.Clear();
                 }
 
                 if (value.EndsWith(quote))
                 {
-                    valueBetweenQuotes.Remove(0, 1);
-                    result.Add(valueBetweenQuotes.ToString());
+                    if(valueBetweenQuotes == null)
+                        valueBetweenQuotes = new StringBuilder(" ").Append(value);
+
+                    if(valueBetweenQuotes.Length == 0)
+                        continue;
+                    
+                    valueBetweenQuotes.Remove(valueBetweenQuotes.Length-1, 1);
+                    quotedString.Append(valueBetweenQuotes);
+                    result.Add(quotedString.ToString());
                     quotedString.Clear();
+                    continue;
+                }
+
+                if (valueBetweenQuotes != null)
+                {
+                    quotedString.Append(valueBetweenQuotes);
                     continue;
                 }
 
                 if (quotedString.Length > 0)
                 {
-                    quotedString.Append(value);
+                    quotedString.Append(' ').Append(value);
                 }
                 else
                 {

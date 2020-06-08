@@ -13,4 +13,10 @@
     <ProjectReference Include="..\Searchfight.Infrastructure\Searchfight.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Searchfight.Application.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
 </Project>
