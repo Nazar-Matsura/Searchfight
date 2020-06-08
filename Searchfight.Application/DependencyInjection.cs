@@ -7,6 +7,7 @@ namespace Searchfight.Application
         public static void AddApplication(this IServiceCollection services)
         {
             services.AddTransient<ISearchfightService, SearchfightService>();
+            services.AddTransient<IMergeQuotedService, MergeQuotedService>();
         }
     }
 }

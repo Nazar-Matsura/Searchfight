@@ -10,35 +10,35 @@ namespace Searchfight.Terminal
     public class App
     {
         private readonly ISearchfightService _searchfightService;
-        
-        public App(ISearchfightService searchfightService)
+        private readonly IMergeQuotedService _mergeQuotedService;
+        private const string Quote = "\"";
+
+        public App(ISearchfightService searchfightService, 
+            IMergeQuotedService mergeQuotedService)
         {
             _searchfightService = searchfightService;
+            _mergeQuotedService = mergeQuotedService;
         }
 
         public async Task Run(string[] args)
         {
             if (args.Any())
             {
+                args = _mergeQuotedService.Merge(args, Quote).ToArray();
                 await SearchAndPrintFor(args);
                 
-                while (ShouldRepeat())
-                {
-                    args = GetSearchTerms();
-                    await SearchAndPrintFor(args);
-                }
+                if(!ShouldRepeat())
+                    return;
             }
-            else
+
+            do
             {
-                do
-                {
-                    args = GetSearchTerms();
-                    await SearchAndPrintFor(args);
-                } while (ShouldRepeat());
-            }
+                args = _mergeQuotedService.Merge(GetSearchTerms(), Quote).ToArray();
+                await SearchAndPrintFor(args);
+            } while (ShouldRepeat());
         }
 
-        private string[] GetSearchTerms()
+        private IEnumerable<string> GetSearchTerms()
         {
             Console.WriteLine("Please enter words to search, separated by space:");
             return Console.ReadLine().Split(' ');
