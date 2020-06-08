@@ -1,44 +1,44 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Searchfight.Core.Domain;
-using Searchfight.Infrastructure;
+using Searchfight.Core.ViewModels;
 
 namespace Searchfight.Application
 {
     internal class SearchfightService : ISearchfightService
     {
-        protected readonly Dictionary<string, ISearchClient> _searchClients;
-
-        public SearchfightService(IGoogleSearchClient googleSearchClient, IBingSearchClient bingSearchClient)
+        public GeneralSearchfightViewModel GenerateReport(List<SearchResults> searchTermResults)
         {
-            _searchClients = new Dictionary<string, ISearchClient>
-            {
-                { "Google", googleSearchClient },
-                { "Bing", bingSearchClient }
-            };
+            var resultsBySearchTerm = BuildResultsBySearchTerm(searchTermResults);
+
+            var resultsBySearchEngine = BuildResultsBySearchEngine(searchTermResults);
+
+            var winner = GetWinner(searchTermResults);
+
+            return new GeneralSearchfightViewModel(resultsBySearchTerm, resultsBySearchEngine, winner);
         }
 
-        public async Task<List<SearchResults>> CountSearchTermsResults(List<string> searchTerms)
+        private string GetWinner(List<SearchResults> searchTermResults)
         {
-            var searchTasks = new List<Task<SearchResults>>();
-            foreach (var searchClient in _searchClients)
-            {
-                foreach (var searchTerm in searchTerms)
-                {
-                    searchTasks.Add(CountSearchTermResult(searchTerm, searchClient.Value, searchClient.Key));
-                }
-            }
-
-            var results = await Task.WhenAll(searchTasks);
-
-            return results.ToList();
+            var maxResults = searchTermResults.Max(r => r.ResultsCount);
+            return searchTermResults.First(r => r.ResultsCount == maxResults).SearchTerm;
+        }
+        
+        private List<SearchEngineWinner> BuildResultsBySearchEngine(List<SearchResults> searchTermResults)
+        {
+            return searchTermResults
+                .GroupBy(r => r.SearchEngine)
+                .Select(g => new SearchEngineWinner(g.Key, GetWinner(g.ToList())))
+                .ToList();
         }
 
-        private async Task<SearchResults> CountSearchTermResult(string searchTerm, ISearchClient client, string clientName)
+        private List<SearchTermResults> BuildResultsBySearchTerm(List<SearchResults> searchTermResults)
         {
-            var count = await client.CountResults(searchTerm);
-            return new SearchResults(clientName, searchTerm, count);
+            return searchTermResults
+                .GroupBy(r => r.SearchTerm)
+                .Select(g => new SearchTermResults(g.Key,
+                    g.Select(r => new SearchEngineResultsCount(r.SearchEngine, r.ResultsCount)).ToList()))
+                .ToList();
         }
     }
 }

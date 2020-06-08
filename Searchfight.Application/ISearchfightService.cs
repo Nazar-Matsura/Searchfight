@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using Searchfight.Core.Domain;
+using Searchfight.Core.ViewModels;
 
 namespace Searchfight.Application
 {
     public interface ISearchfightService
     {
-        Task<List<SearchResults>> CountSearchTermsResults(List<string> searchTerms);
+        GeneralSearchfightViewModel GenerateReport(List<SearchResults> searchTermResults);
     }
 }

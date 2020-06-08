@@ -2,14 +2,14 @@
 {
     public class SearchResults
     {
-        public SearchResults(string searchEngineName, string searchTerm, long resultsCount)
+        public SearchResults(SearchEngine searchEngine, string searchTerm, long resultsCount)
         {
-            SearchEngineName = searchEngineName;
+            SearchEngine = searchEngine;
             SearchTerm = searchTerm;
             ResultsCount = resultsCount;
         }
 
-        public string SearchEngineName { get; }
+        public SearchEngine SearchEngine { get; }
 
         public string SearchTerm { get; }
 

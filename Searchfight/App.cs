@@ -9,14 +9,14 @@ namespace Searchfight.Terminal
 {
     public class App
     {
-        private readonly ISearchfightService _searchfightService;
+        private readonly ISearchDataProvider _searchDataProvider;
         private readonly IMergeQuotedService _mergeQuotedService;
         private const string Quote = "\"";
 
-        public App(ISearchfightService searchfightService, 
+        public App(ISearchDataProvider searchDataProvider, 
             IMergeQuotedService mergeQuotedService)
         {
-            _searchfightService = searchfightService;
+            _searchDataProvider = searchDataProvider;
             _mergeQuotedService = mergeQuotedService;
         }
 
@@ -46,7 +46,7 @@ namespace Searchfight.Terminal
 
         private async Task SearchAndPrintFor(string[] args)
         {
-            var results = await _searchfightService.CountSearchTermsResults(args.ToList());
+            var results = await _searchDataProvider.CountSearchTermsResults(args.ToList());
             PrintResults(results);
         }
 
@@ -56,12 +56,12 @@ namespace Searchfight.Terminal
                 .GroupBy(r => r.SearchTerm);
             foreach (var group in groupedBySearchTerm)
             {
-                var str = group.OrderBy(r => r.SearchEngineName).Select(r => $"{r.SearchEngineName}: {r.ResultsCount}");
+                var str = group.OrderBy(r => r.SearchEngine).Select(r => $"{r.SearchEngine}: {r.ResultsCount}");
                 Console.WriteLine($"{group.Key}: {string.Join(' ', str)}");
             }
 
             var groupedByEngine = results
-                .GroupBy(r => r.SearchEngineName)
+                .GroupBy(r => r.SearchEngine)
                 .Select(g => new {Engine = g.Key, TopResult = g.OrderByDescending(r => r.ResultsCount).First().SearchTerm});
             foreach (var engineResult in groupedByEngine)
             {
