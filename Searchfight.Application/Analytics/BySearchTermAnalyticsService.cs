@@ -12,7 +12,9 @@ namespace Searchfight.Application.Analytics
             return searchResults
                 .GroupBy(r => r.SearchTerm)
                 .Select(g => new SearchTermResults(g.Key,
-                    g.Select(r => new SearchEngineResultsCount(r.SearchEngine, r.ResultsCount)).ToList()))
+                    g.OrderBy(r => r.SearchEngine)
+                        .Select(r => new SearchEngineResultsCount(r.SearchEngine, r.ResultsCount))
+                        .ToList()))
                 .ToList();
         }
     }
