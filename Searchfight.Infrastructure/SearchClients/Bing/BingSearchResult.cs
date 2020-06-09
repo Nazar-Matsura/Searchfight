@@ -1,6 +1,6 @@
 ﻿namespace Searchfight.Infrastructure.SearchClients.Bing
 {
-    internal class BingSearchResult
+    internal class BingSearchResult : ISearchResult
     {
         public WebPagesResult WebPages { get; set; }
 
@@ -8,5 +8,7 @@
         {
             public long TotalEstimatedMatches { get; set; }
         }
+
+        public long TotalResults => WebPages.TotalEstimatedMatches;
     }
 }

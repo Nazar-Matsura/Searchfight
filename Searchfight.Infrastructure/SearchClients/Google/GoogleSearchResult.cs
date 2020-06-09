@@ -1,6 +1,6 @@
 ﻿namespace Searchfight.Infrastructure.SearchClients.Google
 {
-    internal class GoogleSearchResult
+    internal class GoogleSearchResult : ISearchResult
     {
         internal class SearchInformationResult
         {
@@ -8,5 +8,7 @@
         }
 
         public SearchInformationResult SearchInformation { get; set; }
+
+        public long TotalResults => long.Parse(SearchInformation.TotalResults);
     }
 }

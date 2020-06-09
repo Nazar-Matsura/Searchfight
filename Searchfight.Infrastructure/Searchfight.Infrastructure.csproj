@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Searchfight.Domain\Searchfight.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Configuration\infrastructure_settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

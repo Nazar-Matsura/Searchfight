@@ -1,42 +1,28 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Searchfight.Core.Domain;
 using Searchfight.Infrastructure.Configuration;
 
 namespace Searchfight.Infrastructure.SearchClients.Google
 {
-    internal class GoogleSearchClient : IGoogleSearchClient
+    internal class GoogleSearchClient : BaseSearchClient, IGoogleSearchClient
     {
-        private readonly HttpClient _httpClient;
-        private readonly StringBuilder _baseUri;
-
-        public GoogleSearchClient(HttpClient httpClient, IInfrastructureConfiguration config)
+        public GoogleSearchClient(HttpClient httpClient, IInfrastructureConfiguration config):base(httpClient, config, SearchEngine.Google)
         {
-            _httpClient = httpClient;
             _baseUri = new StringBuilder($"https://www.googleapis.com/customsearch/v1?key={config.GoogleAPIKey}&cx={config.GoogleSearchEngineId}");
         }
 
-        public async Task<long> CountResults(string searchTerm)
+        protected override HttpRequestMessage ComposeSearchRequest(string searchTerm)
         {
-            var query = BuildCountResultsQuery(searchTerm);
-            var response = await _httpClient.GetStreamAsync(query);
-            return await ExtractTotalResultsCount(response);
+            return new HttpRequestMessage(HttpMethod.Get, _baseUri.Append($"&q={searchTerm}").ToString());
         }
 
-        private async Task<long> ExtractTotalResultsCount(Stream responseStream)
+        protected override async Task<ISearchResult> DeserializeJson(Stream stream, JsonSerializerOptions options)
         {
-            var serializerOptions = new JsonSerializerOptions {PropertyNameCaseInsensitive = true};
-            var response = await JsonSerializer.DeserializeAsync<GoogleSearchResult>(responseStream, serializerOptions);
-            return long.Parse(response.SearchInformation.TotalResults);
-        }
-
-        private Uri BuildCountResultsQuery(string searchTerm)
-        {
-            var uriString = _baseUri.Append($"&q={searchTerm}").ToString();
-            return new Uri(uriString);
+            return await JsonSerializer.DeserializeAsync<GoogleSearchResult>(stream, options);
         }
     }
 }
