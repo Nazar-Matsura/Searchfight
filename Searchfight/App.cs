@@ -49,9 +49,16 @@ namespace Searchfight.Terminal
 
         private async Task SearchAndPrintFor(string[] args)
         {
-            var data = await _searchDataProvider.CountSearchTermsResults(args.ToList());
-            var report = _searchfightService.GenerateReport(data);
-            PrintResults(report);
+            try
+            {
+                var data = await _searchDataProvider.CountSearchTermsResults(args.ToList());
+                var report = _searchfightService.GenerateReport(data);
+                PrintResults(report);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         private void PrintResults(GeneralSearchfightViewModel results)
